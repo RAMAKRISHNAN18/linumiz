@@ -1,0 +1,76 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_STACK_SIZE 10
+#define MAX_DIR_LENGTH 100
+
+// Structure to represent a stack node
+struct StackNode {
+    char directory[MAX_DIR_LENGTH];
+    struct StackNode* next;
+};
+
+// Global variables
+struct StackNode* stackTop = NULL;
+
+// Function prototypes
+void pushd(const char *dir);
+void popd();
+void printStack();
+
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        printf("Usage: %s <directory1> <directory2> ... \n", argv[0]);
+        return 1;
+    }
+
+    // Process each command-line argument as a directory to push onto stack
+    for (int i = 1; i < argc; i++) {
+        pushd(argv[i]);
+    }
+
+    // Print current stack state
+    printf("Current stack state:\n");
+    printStack();
+
+    // Pop the top directory from stack
+    popd();
+
+    // Print stack state after popping
+    printf("\nStack state after pop:\n");
+    printStack();
+
+    return 0;
+}
+
+void pushd(const char *dir) {
+    if (stackTop == NULL) {
+        stackTop = (struct StackNode*) malloc(sizeof(struct StackNode));
+        strncpy(stackTop->directory, dir, MAX_DIR_LENGTH);
+        stackTop->directory[MAX_DIR_LENGTH - 1] = '\0';
+        stackTop->next = NULL;
+    } else {
+        struct StackNode* newNode = (struct StackNode*) malloc(sizeof(struct StackNode));
+        strncpy(newNode->directory, dir, MAX_DIR_LENGTH);
+        newNode->directory[MAX_DIR_LENGTH - 1] = '\0';
+        newNode->next = stackTop;
+        stackTop = newNode;
+    }
+}
+
+void popd() {
+
+    struct StackNode* temp = stackTop;
+    stackTop = stackTop->next;
+    printf("Popping directory: %s\n", temp->directory);
+    free(temp);
+}
+
+void printStack() {
+    struct StackNode* current = stackTop;
+    while (current != NULL) {
+        printf("%s\n", current->directory);
+        current = current->next;
+    }
+}
